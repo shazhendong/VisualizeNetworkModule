@@ -4,6 +4,7 @@
 
 import sys
 import scr.ppi as ppi
+import networkx as nx
 
 
 if __name__ == "__main__":
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     print('Merging gml files: ' + str(gml_files))
 
     # read gml files
-    gmls = [ppi.read_gml(file_gml) for file_gml in gml_files]
+    gmls = [nx.read_gml(file_gml) for file_gml in gml_files]
 
     # print number of nodes and edges in each gml
     for i in range(len(gmls)):
@@ -24,4 +25,4 @@ if __name__ == "__main__":
     
     # write merged gml
     outputFileName = 'merged.gml'
-    ppi.write_gml(merged, outputFileName)
+    nx.write_gml(merged, outputFileName)

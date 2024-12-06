@@ -18,12 +18,6 @@ class Interactome(object):
         G = self.get_PPI()
         return G.subgraph(gene_list)
 
-def write_gml(subnetwork, outputFileName):
-    nx.write_gml(subnetwork, outputFileName)
-
-def read_gml(file_gml):
-    return nx.read_gml(file_gml)
-
 def augment_networks(net_1, net_2, dup_edge=True):
     # augment net_1 with net_2. return the augmented network
     # dup_edge: if True, duplicate edges are allowed. if False, duplicate edges are not allowed

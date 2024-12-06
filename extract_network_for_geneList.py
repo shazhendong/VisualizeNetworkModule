@@ -4,6 +4,7 @@
 import sys
 import scr.mapgene as mg
 import scr.ppi as ppi
+import networkx as nx
 
 def process_geneList(file_geneList):
     geneList = []
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 
     # write subnetwork
     outputFileName = file_geneList.split('.')[0] + '.gml'
-    ppi.write_gml(subnetwork, outputFileName)
+    nx.write_gml(subnetwork, outputFileName)
 
 
 
