@@ -9,3 +9,7 @@ Run the following command to use extract_network_for_geneList.py.
 Run the following command to merge the networks.
 
 ```python merge_gmls.py network1.gml network2.gml network3.gml ...```
+
+Run the following command to expand edges based on attribute values.
+
+```python expand_edges.py network.gml [attribute]```
