@@ -25,17 +25,17 @@ def extract_network_for_geneList(geneList_ncbi, file_network):
     subnetwork = Interactome.get_subnetwork(geneList_ncbi)
     return subnetwork
 
-def annotate_network(subnetwork, querry_name):
-    # annotate the subnetwork. for nodes add symbol attribute and querry attribute, for edges add querry attributes. return the annotated subnetwork
+def annotate_network(subnetwork, query_name):
+    # annotate the subnetwork. for nodes add symbol attribute and query attribute, for edges add query attributes. return the annotated subnetwork
     MappingGene = mg.init_geneName_mapping() # initialize MappingGene
     # annotate nodes
     for node in subnetwork.nodes():
         symbol = mg.map_NCBI_to_HGNC_to_symbol(node, MappingGene)
         subnetwork.nodes[node]['symbol'] = symbol
-        subnetwork.nodes[node]['querry'] = querry_name
+        subnetwork.nodes[node]['query'] = query_name
     # annotate edges
     for edge in subnetwork.edges():
-        subnetwork.edges[edge]['querry'] = querry_name
+        subnetwork.edges[edge]['query'] = query_name
     return subnetwork
     
 
