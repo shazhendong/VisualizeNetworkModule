@@ -12,11 +12,28 @@ class Interactome(object):
         self.G.remove_edges_from(nx.selfloop_edges(self.G))
         return self.G
 
-    def get_subnetwork(self, gene_list):
+    def get_subnetwork(self, gene_list, hop=0):
         # remove None from gene_list
         gene_list = [gene for gene in gene_list if gene is not None]
         G = self.get_PPI()
-        return G.subgraph(gene_list)
+        if hop == 0:
+            return G.subgraph(gene_list)
+        
+        # Use a set to track the nodes to include in the subnetwork
+        subnetwork_nodes = set(gene_list)
+
+        # Expand the subnetwork by hop distance
+        for _ in range(hop):
+            neighbors = set()
+            for gene in subnetwork_nodes:
+                if gene in G:
+                    neighbors.update(G.neighbors(gene))
+            subnetwork_nodes.update(neighbors)
+
+        return G.subgraph(subnetwork_nodes)
+                    
+                    
+
 
 def augment_networks(net_1, net_2, dup_edge=True):
     # augment net_1 with net_2. return the augmented network
