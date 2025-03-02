@@ -19,11 +19,11 @@ def process_geneList(file_geneList):
     geneList_ncbi = [gene for gene in geneList_ncbi if gene is not None] # remove None entries
     return geneList_ncbi
 
-def extract_network_for_geneList(geneList_ncbi, file_network, hop=0):
+def extract_network_for_geneList(geneList_ncbi, file_network):
     # load network class
     Interactome = ppi.Interactome(pathG=file_network)
     # get subnetwork
-    subnetwork = Interactome.get_subnetwork(geneList_ncbi, hop)
+    subnetwork = Interactome.get_subnetwork(geneList_ncbi)
     return subnetwork
 
 def annotate_network(subnetwork, query_name):
@@ -32,8 +32,6 @@ def annotate_network(subnetwork, query_name):
     # annotate nodes
     for node in subnetwork.nodes():
         symbol = mg.map_NCBI_to_HGNC_to_symbol(node, MappingGene)
-        if symbol is None:
-            symbol = 'None'
         subnetwork.nodes[node]['symbol'] = symbol
         subnetwork.nodes[node]['query'] = query_name
     # annotate edges
@@ -47,11 +45,7 @@ if __name__ == "__main__":
     # read parameters
     file_geneList = sys.argv[1]
     if len(sys.argv) > 2:
-        hop = int(sys.argv[2])
-    else:
-        hop = 0
-    if len(sys.argv) > 3:
-        file_network = sys.argv[3]
+        file_network = sys.argv[2]
     else:
         file_network = 'scr/ppi/HumanInteractome_350k.tsv'
 
@@ -67,26 +61,9 @@ if __name__ == "__main__":
     # annotate subnetwork
     subnetwork = annotate_network(subnetwork, file_geneList.split('.')[0])
 
-    if hop == 0:
-        # write subnetwork
-        outputFileName = file_geneList.split('.')[0] + '.gml'
-        nx.write_gml(subnetwork, outputFileName)
-    else:
-        # make subnetwork with hop
-        subnetwork_hop = extract_network_for_geneList(geneList_ncbi, file_network, hop)
+    # write subnetwork
+    outputFileName = file_geneList.split('.')[0] + '.gml'
+    nx.write_gml(subnetwork, outputFileName)
 
-        # annotate subnetwork_hop
-        subnetwork_hop = annotate_network(subnetwork_hop, file_geneList.split('.')[0]+'_'+str(hop)+'hop')
-
-        # augment subnetwork with subnetwork_hop
-        subnetwork_hop = ppi.augment_networks(subnetwork.copy(), subnetwork_hop)
-
-        # print the number of nodes and edges in subnetwork_hop
-        print('Number of nodes in subnetwork_hop: ' + str(subnetwork_hop.number_of_nodes()))
-        print('Number of edges in subnetwork_hop: ' + str(subnetwork_hop.number_of_edges()))
-
-        # write subnetwork_hop
-        outputFileName = file_geneList.split('.')[0] + '_' + str(hop) + 'hop.gml'
-        nx.write_gml(subnetwork_hop, outputFileName)
 
 
