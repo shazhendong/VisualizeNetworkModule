@@ -107,15 +107,15 @@ if __name__ == "__main__":
         pairsLinked = arr_pairsLinked[i]
         # add mediator gene to the network, with attributes symbol and query equal to "network_gml".split('.')[0] + "_mediator"
         # print(f"Mediator gene: {mediator_gene}")
-        G_module.add_node(mediator_gene, symbol=mg.map_NCBI_to_HGNC_to_symbol(mediator_gene, mappingGene), query=network_gml.split('.')[0] + "_mediator")
+        G_module.add_node(mediator_gene + "_mediator", symbol=mg.map_NCBI_to_HGNC_to_symbol(mediator_gene, mappingGene), query=network_gml.split('.')[0] + "_mediator")
         # add edges between mediator gene and linked pairs with attribute query equal to "network_gml".split('.')[0] + "_mediator"
         for pair in pairsLinked:
             # check if mediator_gene, pair[0] is not in G_module
-            if not G_module.has_edge(mediator_gene, pair[0]):
-                G_module.add_edge(mediator_gene, pair[0], query=network_gml.split('.')[0] + "_mediator")
+            if not G_module.has_edge(mediator_gene + "_mediator", pair[0]):
+                G_module.add_edge(mediator_gene + "_mediator", pair[0], query=network_gml.split('.')[0] + "_mediator")
             # check if mediator_gene, pair[1] is not in G_module
-            if not G_module.has_edge(mediator_gene, pair[1]):
-                G_module.add_edge(mediator_gene, pair[1], query=network_gml.split('.')[0] + "_mediator")
+            if not G_module.has_edge(mediator_gene + "_mediator", pair[1]):
+                G_module.add_edge(mediator_gene + "_mediator", pair[1], query=network_gml.split('.')[0] + "_mediator")
     
     # 6. save the network with mediator genes
     output_gml = "mediated_" + network_gml
