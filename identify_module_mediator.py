@@ -43,19 +43,11 @@ if __name__ == "__main__":
         for j in range(i+1, len(nodes)):
             if m_distance[i, j] == 2:
                 eligible_pairs.append((nodes[i], nodes[j]))
-    
-    # check if the eligible pairs have path in G_module
-    for pair in eligible_pairs:
-        try:
-            path = nx.shortest_path(G_module, pair[0], pair[1])
-            # print(f"Path between {pair[0]} and {pair[1]}: {path}")
-            eligible_pairs.remove(pair)
-        except nx.NetworkXNoPath:
-            pass
-    # print(f"Number of eligible pairs: {len(eligible_pairs)}")
+    print(f"Number of eligible pairs: {len(eligible_pairs)}")
     
     # 3. identify the mediator genes for each eligible pair
     arr_mediator_genes = []
+    list_prohibited_genes = ['7316'] # UBC
     for pair in eligible_pairs:
         # get all shortest paths between the pair
         shortest_paths = list(nx.all_shortest_paths(G_PPI, pair[0], pair[1]))
@@ -63,7 +55,22 @@ if __name__ == "__main__":
         mediator_genes = set()
         for path in shortest_paths:
             mediator_genes.update(path[1:-1])
+        # remove genes in G_module from mediator_genes
+        mediator_genes = mediator_genes - set(nodes)
+        # remove prohibited genes from mediator_genes
+        mediator_genes = mediator_genes - set(list_prohibited_genes)
+        # add mediator_genes to arr_mediator_genes
         arr_mediator_genes.append(mediator_genes)
+
+    # scan arr_mediator_genes to see if there is empty set, if so, remove the pair from eligible_pairs and arr_mediator_genes
+    checked_arr_mediator_genes = []
+    checked_eligible_pairs = []
+    for i in range(len(arr_mediator_genes)):
+        if len(arr_mediator_genes[i]) > 0:
+            checked_arr_mediator_genes.append(arr_mediator_genes[i])
+            checked_eligible_pairs.append(eligible_pairs[i])
+    arr_mediator_genes = checked_arr_mediator_genes
+    eligible_pairs = checked_eligible_pairs
     
     # 4. identify mediator genes for all eligible pairs
     arr_mediator_gene = [] # the mediator genes used for linking pairs
@@ -80,6 +87,12 @@ if __name__ == "__main__":
         sorted_mediator_freq = sorted(mediator_freq.items(), key=lambda x: x[1], reverse=True)
         # get the mediator gene with the highest frequency
         mediator_gene = sorted_mediator_freq[0][0]
+        # avoid using 7316 (UBC) as mediator gene if we have other options (number of eligible genes in sorted_mediator_freq > 1)
+        if len(sorted_mediator_freq) > 1 and mediator_gene == '7316':
+            mediator_gene = sorted_mediator_freq[1][0]
+        elif len(sorted_mediator_freq) > 0 and mediator_gene == '7316':
+            print("No other mediator gene available to replace 7316")
+
         # add the mediator gene to arr_mediator_gene
         # print(f"Mediator gene: {mediator_gene}")
         arr_mediator_gene.append(mediator_gene)
@@ -113,10 +126,10 @@ if __name__ == "__main__":
         for pair in pairsLinked:
             # check if mediator_gene, pair[0] is not in G_module
             if not G_module.has_edge(mediator_gene + "_" + scr_query, pair[0]):
-                G_module.add_edge(mediator_gene + "_" + scr_query, pair[0], query=network_gml.split('.')[0])
+                G_module.add_edge(mediator_gene + "_" + scr_query, pair[0], query=scr_query)
             # check if mediator_gene, pair[1] is not in G_module
             if not G_module.has_edge(mediator_gene + "_" + scr_query, pair[1]):
-                G_module.add_edge(mediator_gene + "_" + scr_query, pair[1], query=network_gml.split('.')[0])
+                G_module.add_edge(mediator_gene + "_" + scr_query, pair[1], query=scr_query)
     
     # 6. save the network with mediator genes
     output_gml = "mediated_" + network_gml
