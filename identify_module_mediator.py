@@ -47,7 +47,7 @@ if __name__ == "__main__":
     
     # 3. identify the mediator genes for each eligible pair
     arr_mediator_genes = []
-    list_prohibited_genes = ['7316'] # UBC
+    list_prohibited_genes = ['7316', '7273'] # UBC, TTN
     for pair in eligible_pairs:
         # get all shortest paths between the pair
         shortest_paths = list(nx.all_shortest_paths(G_PPI, pair[0], pair[1]))
